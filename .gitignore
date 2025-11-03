@@ -1,0 +1,14 @@
+# Virtual environment folders
+venv/
+env/
+
+# Jupyter and Python cache
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+
+# Environment and API keys
+.env
+
+# Raw data (optional)
+data/raw/
