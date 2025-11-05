@@ -157,7 +157,66 @@ Based on the full analysis, here are the most important:
    **The encoded dataset was saved as TMDB project/data/encoded_movies.csv**
 
 
-# MODELLING
+# TMDB Movie Revenue Prediction
+
+## 🧩 Introduction
+
+This project aims to **predict the box office revenue** of movies using data collected from **The Movie Database (TMDB) API**.
+
+This notebook (`TMDB modelling phase.ipynb`) covers the end-to-end process of building and evaluating predictive models. This follows previous stages of data collection, data cleaning, and exploratory data analysis (EDA). The goal is to identify the best-performing algorithm for revenue prediction based on features like `budget`, `popularity`, `runtime`, and `genre`.
+
+## ⚙️ Methodology
+
+The notebook follows a structured approach to modeling:
+
+### 1. Data Loading
+* The preprocessed and encoded dataset (`encoded_movies.csv`) is loaded.
+
+### 2. Feature Engineering
+Before modeling, several features were engineered to improve performance:
+* **Log Transformation:** The `revenue` (target) and `budget` (feature) columns were log-transformed using `np.log1p()` to handle their right-skewed distributions.
+* **New Ratio Feature:** A new feature, `budget_popularity_ratio`, was created.
+* **Binning & Encoding:** The continuous `runtime` feature was binned into four categories ('Short', 'Medium', 'Long', 'Very Long') and then one-hot encoded for model consumption.
+
+### 3. Model Training
+* The dataset was split into training (80%) and testing (20%) sets.
+* Four different regression algorithms were trained using their default settings:
+    1.  Linear Regression
+    2.  Decision Tree Regressor
+    3.  Random Forest Regressor
+    4.  XGBoost Regressor
+
+### 4. Model Evaluation
+* All models were evaluated on the test set using **R²**, **MAE (Mean Absolute Error)**, and **RMSE (Root Mean Squared Error)**.
+* Crucially, the log-transformed predictions were reversed (`np.expm1`) to evaluate all models on their **original dollar scale** performance.
+
+## ✅ Results & Comparison
+
+To properly contextualize the errors, the mean revenue of the dataset was calculated: **\$128,210,875**.
+
+The performance of the models on the original dollar scale is as follows:
+
+| Model | R² Score (Higher is Better) | MAE (Lower is Better) | RMSE (Lower is Better) |
+| :--- | :--- | :--- | :--- |
+| **XGBoost Regressor** | **0.5378** | \$70,072,567 | **\$146,790,839** |
+| **Random Forest** | 0.5212 | **\$68,464,761** | \$149,403,008 |
+| **Decision Tree** | 0.3805 | \$78,862,572 | \$169,942,852 |
+| **Linear Regression** | -0.8118 | \$98,878,627 | \$290,627,437 |
+
+### Analysis
+* **Linear Regression** failed to model the non-linear relationships, producing a negative R² score.
+* The **Decision Tree** was a major improvement but was clearly outperformed by the ensemble methods.
+* **Random Forest** achieved the **best (lowest) MAE**, meaning its predictions were, on average, the closest to the actual revenue (~53% error relative to the mean).
+* **XGBoost Regressor** was the **top overall performer**, with the **best R² score** (explaining ~54% of revenue variance) and the **best (lowest) RMSE**, indicating it was most effective at avoiding large, costly prediction errors.
+
+## 🚀 Next Steps
+
+Based on this strong baseline performance, two models were selected for further optimization:
+
+1.  **XGBoost Regressor**
+2.  **Random Forest Regressor**
+
+The next stage of this project will involve **hyperparameter tuning** for these two models to further improve their predictive accuracy.
 
 
 
