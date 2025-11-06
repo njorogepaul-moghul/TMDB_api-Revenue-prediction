@@ -1,0 +1,10 @@
+pandas
+requests
+python-dotenv
+tqdm
+scikit-learn
+joblib
+matplotlib
+seaborn
+notebook
+xgboost

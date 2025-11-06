@@ -15,7 +15,7 @@ This project leverages TMDB data to:
 
 ---
 
-# ⚙️ Data Collection
+# ⚙️ Data Collection phase
 
 Data was obtained using the **TMDB API**, fetching details for popular movies and their metadata such as:
 - Budget  
@@ -32,7 +32,7 @@ After fetching the data, two datasets were merged:
 
 ---
 
-# 🧹 Data Cleaning
+# 🧹 Data Cleaning phase
 
 Cleaning steps included:
 - Merging datasets on the `id` column.  
@@ -57,7 +57,7 @@ genres → list of movie genres (e.g., Action, Drama, Comedy)
 
 The cleaned dataset was saved as:data/cleaned_movies.csv
 
-# 📊 TMDB Movie Database - Exploratory Data Analysis (EDA)
+# 📊 TMDB Movie Database - Exploratory Data Analysis (EDA) phase
 
 ## Setup & Imports
 
@@ -157,7 +157,7 @@ Based on the full analysis, here are the most important:
    **The encoded dataset was saved as TMDB project/data/encoded_movies.csv**
 
 
-# TMDB Movie Revenue Prediction
+# TMDB Movie Revenue Prediction- Modelling phase
 
 ## 🧩 Introduction
 
@@ -209,14 +209,65 @@ The performance of the models on the original dollar scale is as follows:
 * **Random Forest** achieved the **best (lowest) MAE**, meaning its predictions were, on average, the closest to the actual revenue (~53% error relative to the mean).
 * **XGBoost Regressor** was the **top overall performer**, with the **best R² score** (explaining ~54% of revenue variance) and the **best (lowest) RMSE**, indicating it was most effective at avoiding large, costly prediction errors.
 
-## 🚀 Next Steps
+##  Final Model Comparison & Conclusion(after hyperparameter tuning)
 
-Based on this strong baseline performance, two models were selected for further optimization:
+We have now built, evaluated, and tuned our models. The final step is to compare our best-performing models to select a single champion for our pipeline.
 
-1.  **XGBoost Regressor**
-2.  **Random Forest Regressor**
+### Final Model Performance
 
-The next stage of this project will involve **hyperparameter tuning** for these two models to further improve their predictive accuracy.
+This table shows the performance of the **best version** of each model we tested, evaluated on the original dollar scale.
+
+| Model Version | R² Score (Higher is Better) | MAE (Lower is Better) | RMSE (Lower is Better) |
+| :--- | :--- | :--- | :--- |
+| **Tuned XGBoost (Grid Search)** | **0.5744** | **\$67,412,206** | **\$140,863,770** |
+| Tuned XGBoost (Random Search) | 0.5505 | \$68,520,713 | \$144,760,660 |
+| Default XGBoost | 0.5378 | \$70,072,567 | \$146,790,839 |
+| Default Random Forest | 0.5212 | \$68,464,761 | \$149,403,008 |
+| Tuned Random Forest (Grid) | 0.4887 | \$70,059,528 | \$154,394,718 |
+| Tuned Random Forest (Random) | 0.4740 | \$70,886,283 | \$156,588,599 |
+| Default Decision Tree | 0.3805 | \$78,862,572 | \$169,942,852 |
+| Default Linear Regression | -0.8118 | \$98,878,627 | \$290,627,437 |
+
+---
+
+##  Conclusion & Insights
+
+### 🏆 The Champion Model
+
+The **Tuned XGBoost Regressor (from `GridSearchCV`)** is the clear and definitive winner. It outperformed all other models across all three evaluation metrics:
+
+1.  **Highest R² (0.5744):** It explains approximately **57.4%** of the variance in movie revenue, the most of any model.
+2.  **Lowest MAE (\$67.4M):** Its predictions are the most accurate on average.
+3.  **Lowest RMSE (\$140.9M):** It is the most effective at avoiding very large, costly prediction errors.
+
+### 💡 Key Insights
+
+* **Tuning was Critical:** Hyperparameter tuning was highly effective. Our baseline XGBoost model (R²: 0.538) saw a significant performance boost from randomized search (R²: 0.551) and another solid jump from focused grid search (R²: 0.574).
+* **Contextualizing Error:** Our final model's average error is **\$67.4 million**. Compared to the dataset's mean revenue of **\$128.2 million**, this means our model's predictions are, on average, off by about **52.6%**. This highlights the inherent difficulty and high variance in predicting box office success, even with good data.
+* **Model Selection Matters:** The ensemble methods (XGBoost, Random Forest) were dramatically better than the simpler Linear Regression and Decision Tree models, confirming that the relationships in the data are complex and non-linear.
+* **Tuning Isn't Always Better:** For Random Forest, the default parameters (R²: 0.521) were more robust than any of our tuned versions, which appeared to overfit the training data and performed worse on the test set.
+
+**Final Decision:** The model `final_model` (the `best_estimator_` from our `xgb_grid_search`) is our champion model and will be the one we productionalize.
+
+---
+
+## Next Steps: Pipeline Development
+
+The modeling and selection phase is complete. Our next objective is to build a robust, reproducible production **pipeline**.
+
+This will involve:
+1.  **Analyzing Feature Importances** from our `final_model` to understand *what* drives its predictions.
+2.  **Creating a `ColumnTransformer`** to perform all of our feature engineering steps (log-transforming, binning, encoding) in one object.
+3.  **Building a `scikit-learn` Pipeline** that combines the `ColumnTransformer` with our `final_model`.
+4.  **Training this single pipeline** on the full dataset and **saving it to a file** (e.g., `final_model.pkl`) so it can be easily loaded in another script or application for predictions.
+
+
+
+
+
+
+
+
 
 
 
