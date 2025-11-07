@@ -1,4 +1,5 @@
 # 🎬 Movie Revenue Prediction
+## **STATUS:IN PROGRESS**
 
 This project aims to predict movie revenues using data collected from the **TMDB (The Movie Database) API**.  
 It combines **data engineering**, **data cleaning**, **exploratory data analysis**, and **predictive modeling** to uncover insights into what drives a movie’s financial success.
